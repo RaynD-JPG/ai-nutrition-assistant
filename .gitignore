@@ -1,0 +1,7 @@
+This file tells Git which files and folders to ignore.
+Ignore the file containing the secret API key
+config.js
+
+Ignore common files that don't need to be in the repository
+.env
+node_modules/
