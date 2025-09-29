@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const mealLogContainer = document.getElementById('meal-log-container');
     const emptyLogMessage = document.getElementById('empty-log-message');
 
-    // Dashboard elements
+
     const totalCaloriesEl = document.getElementById('total-calories');
     const totalProteinEl = document.getElementById('total-protein');
     const totalCarbsEl = document.getElementById('total-carbs');
@@ -20,8 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let dailyLog = [];
     let calorieGoal = 2000;
 
-    // --- GEMINI API CALL ---
-    // The API key is now loaded from the separate, untracked config.js file
     const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`; 
 
     const nutritionSchema = {
@@ -71,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let response;
         try {
-            // Exponential backoff retry logic
             let attempt = 0;
             const maxAttempts = 5;
             while (attempt < maxAttempts) {
@@ -82,16 +79,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (response.ok) {
-                    break; // Success
+                    break; 
                 }
 
                 if (response.status === 429 || response.status >= 500) {
-                     // Throttling or server error
                     const delay = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
                     await new Promise(resolve => setTimeout(resolve, delay));
                     attempt++;
                 } else {
-                    // Other client-side errors, don't retry
                     throw new Error(`API Error: ${response.statusText} (Status: ${response.status})`);
                 }
             }
@@ -116,9 +111,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // --- UI UPDATE FUNCTIONS ---
+
     function renderMealLog() {
-        mealLogContainer.innerHTML = ''; // Clear existing log
+        mealLogContainer.innerHTML = '';
         if (dailyLog.length === 0) {
             mealLogContainer.appendChild(emptyLogMessage);
             emptyLogMessage.classList.remove('hidden');
@@ -148,7 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 mealLogContainer.appendChild(mealElement);
             });
             
-            // Add event listeners to new remove buttons
             document.querySelectorAll('.remove-meal-btn').forEach(btn => {
                btn.addEventListener('click', handleRemoveMeal);
             });
@@ -188,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDashboard();
     }
 
-    // --- EVENT HANDLERS ---
     async function handleLogMeal() {
         const description = mealInput.value.trim();
         if (!description) {
@@ -196,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // UI updates for loading state
+
         logMealBtn.disabled = true;
         logMealBtn.textContent = 'Analyzing...';
         loader.classList.remove('hidden');
@@ -207,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (analysis && analysis.meal_summary && analysis.food_items) {
                 dailyLog.push({ description, analysis });
                 updateUI();
-                mealInput.value = ''; // Clear input on success
+                mealInput.value = ''; 
             } else {
                 showError("The AI could not analyze this meal. Please try rephrasing.");
             }
@@ -245,7 +238,6 @@ document.addEventListener('DOMContentLoaded', () => {
         errorMessage.classList.remove('hidden');
     }
 
-    // --- INITIALIZATION ---
     logMealBtn.addEventListener('click', handleLogMeal);
     calorieGoalInput.addEventListener('input', handleGoalChange);
     clearLogBtn.addEventListener('click', handleClearLog);
